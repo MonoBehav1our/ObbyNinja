@@ -21,7 +21,7 @@ namespace Codebase.Game.Gameplay.Player
 
         private void LateUpdate()
         {
-            //Follow();
+            Follow();
             RotateVision(new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")));
         }
         
