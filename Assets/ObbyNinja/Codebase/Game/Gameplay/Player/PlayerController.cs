@@ -1,30 +1,37 @@
+using Codebase.Game.Root.Input;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Codebase.Game.Gameplay.Player
 {
     public class PlayerController : MonoBehaviour
     {
-        [FormerlySerializedAs("_walkingSpeed"),Header("Movement settings")]
+        [Header("Movement settings")]
         [SerializeField] private float _moveSpeed;
         [SerializeField] private float _jumpForce;
         [SerializeField] private LayerMask _groundLayers;
+        
+        [Header("Look settings")]
         [SerializeField] private Transform _playerCamera;
         [SerializeField] private float _rotationSpeed;
 
-        private CapsuleCollider _collider;
-        private Rigidbody _rigidBody;
         
         private bool IsGrounded => Physics.Raycast(transform.position, Vector3.down, _collider.height / 2 + 0.1f, _groundLayers);
         private Vector3 ForwardDirection => _playerCamera.TransformDirection(Vector3.forward);
         private Vector3 RightDirection => _playerCamera.TransformDirection(Vector3.right);
 
+        private CapsuleCollider _collider;
+        private Rigidbody _rigidBody;
+        private InputManager _inputManager;
+        
         private Quaternion _targetRotation;
+        private Vector2 _moveDirection;
 
         private void Start()
         {
-            Cursor.visible = false;
-            Cursor.lockState = CursorLockMode.Locked;
+            /*Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;*/
+            _inputManager = new InputManager();
+            _inputManager.OnJump += Jump;
             
             _rigidBody = GetComponent<Rigidbody>();
             _collider = GetComponent<CapsuleCollider>();
@@ -32,20 +39,22 @@ namespace Codebase.Game.Gameplay.Player
 
         private void Update()
         {
-            Move(new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")));
+            Move(_inputManager.Movement);
             
             transform.rotation = Quaternion.RotateTowards(transform.rotation, _targetRotation, _rotationSpeed * Time.deltaTime);
             
-            if(Input.GetKeyDown(KeyCode.Space))
-                Jump();
+            /*if(Input.GetKeyDown(KeyCode.Space))
+                Jump();*/
         }
 
         private void Move(Vector2 direction)
         {
-            if (direction.magnitude <= 0.1f) return;
+            _moveDirection = direction;
+            
+            if (_moveDirection.magnitude <= 0.1f) return;
             
             var velocityY = _rigidBody.velocity.y;
-            var moveDirection = (ForwardDirection * direction.y + RightDirection * direction.x).normalized;
+            var moveDirection = (ForwardDirection * _moveDirection.y + RightDirection * _moveDirection.x).normalized;
             
             var velocity = moveDirection * _moveSpeed;
             velocity.y = velocityY;

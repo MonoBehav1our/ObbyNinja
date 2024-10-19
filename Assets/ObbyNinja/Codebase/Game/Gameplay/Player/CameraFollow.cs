@@ -1,4 +1,5 @@
 using System;
+using Codebase.Game.Root.Input;
 using UnityEngine;
 
 namespace Codebase.Game.Gameplay.Player
@@ -13,16 +14,19 @@ namespace Codebase.Game.Gameplay.Player
         private float _rotationX;
         private float _rotationY;
         private Vector3 _followOffset;
+        private InputManager _inputManager;
 
         private void Start()
         {
+            _inputManager = new InputManager();
+            _inputManager.OnMouseDeltaChange += RotateVision;
             _followOffset = transform.position - _follow.position;
         }
 
         private void LateUpdate()
         {
             Follow();
-            RotateVision(new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")));
+            //RotateVision(new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y")));
         }
         
         private void Follow()
