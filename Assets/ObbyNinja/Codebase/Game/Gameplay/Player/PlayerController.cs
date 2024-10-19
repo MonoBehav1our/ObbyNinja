@@ -15,12 +15,13 @@ namespace Codebase.Game.Gameplay.Player
         [SerializeField] private float _rotationSpeed;
 
         
-        private bool IsGrounded => Physics.Raycast(transform.position, Vector3.down, _collider.height / 2 + 0.1f, _groundLayers);
+        private bool IsGrounded => Physics.Raycast(transform.position, Vector3.down,  0.2f, _groundLayers);
         private Vector3 ForwardDirection => _playerCamera.TransformDirection(Vector3.forward);
         private Vector3 RightDirection => _playerCamera.TransformDirection(Vector3.right);
 
         private CapsuleCollider _collider;
         private Rigidbody _rigidBody;
+        private Animator _animator;
         private InputManager _inputManager;
         
         private Quaternion _targetRotation;
@@ -35,6 +36,7 @@ namespace Codebase.Game.Gameplay.Player
             
             _rigidBody = GetComponent<Rigidbody>();
             _collider = GetComponent<CapsuleCollider>();
+            _animator = GetComponent<Animator>();
         }
 
         private void Update()
@@ -43,6 +45,9 @@ namespace Codebase.Game.Gameplay.Player
             
             transform.rotation = Quaternion.RotateTowards(transform.rotation, _targetRotation, _rotationSpeed * Time.deltaTime);
             
+            _animator.SetFloat("Direction", _inputManager.Movement.magnitude);
+            _animator.SetBool("IsGrounded", IsGrounded);
+            print(IsGrounded);
             /*if(Input.GetKeyDown(KeyCode.Space))
                 Jump();*/
         }
